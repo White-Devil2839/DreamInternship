@@ -1,12 +1,18 @@
 import { useMemo } from 'react';
 import KPICard from '../components/dashboard/KPICard';
+import RevenueChart from '../components/dashboard/RevenueChart';
+import RegionChart from '../components/dashboard/RegionChart';
+import RiskChart from '../components/dashboard/RiskChart';
 import transactions from '../data/transactions.json';
 import {
   calculateTotalRevenue,
   calculateTotalLeakage,
   calculateLeakagePercentage,
   calculateAverageTransaction,
-  countSuspiciousTransactions
+  countSuspiciousTransactions,
+  groupRevenueByMonth,
+  groupRevenueByRegion,
+  groupRiskDistribution
 } from '../utils/calculations';
 
 function Dashboard() {
@@ -35,13 +41,28 @@ function Dashboard() {
     []
   );
 
+  const monthlyRevenue = useMemo(() => 
+    groupRevenueByMonth(transactions), 
+    []
+  );
+
+  const regionRevenue = useMemo(() => 
+    groupRevenueByRegion(transactions), 
+    []
+  );
+
+  const riskDistribution = useMemo(() => 
+    groupRiskDistribution(transactions), 
+    []
+  );
+
   const totalTransactions = transactions.length;
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <KPICard
           title="Total Revenue"
           value={`₹${totalRevenue.toLocaleString()}`}
@@ -71,6 +92,15 @@ function Dashboard() {
           value={`₹${avgTransaction.toLocaleString()}`}
           subtitle="Per transaction"
         />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <RevenueChart data={monthlyRevenue} />
+        <RegionChart data={regionRevenue} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <RiskChart data={riskDistribution} />
       </div>
     </div>
   );
