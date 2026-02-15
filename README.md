@@ -40,7 +40,7 @@ src/
 ├── context/
 │   └── FilterContext.jsx         # Global filter state management
 ├── data/
-│   └── transactions.json         # Mock transaction dataset (100 entries)
+│   └── generateTransactions.js   # Dynamic seeded transaction generator
 ├── pages/
 │   ├── Dashboard.jsx             # Main dashboard with KPIs and charts
 │   ├── Transactions.jsx          # Transaction table with sorting
@@ -50,6 +50,59 @@ src/
 ├── App.jsx                       # Root component with routing
 └── main.jsx                      # Application entry point
 ```
+
+## Mock Data Generation
+
+### Dynamic Seeded Generation
+
+The application uses a **deterministic seeded random number generator** to create consistent mock transaction data:
+
+- **100 Transactions**: Generated with realistic values
+- **Date Range**: Dynamically spread across the last 6 months from current date
+- **Regions**: North, South, East, West (random distribution)
+- **Types**: Online, POS, Transfer (random distribution)
+- **Amounts**: Random values between ₹8,000 - ₹20,000
+- **Risk Scores**: Random values 0.00 - 1.00 (2 decimal precision)
+- **Status**: Automatically assigned ("Suspicious" if riskScore >= 0.7, else "Normal")
+- **Leakage**: Calculated as 5-15% of transaction amount
+
+### Session Persistence
+
+The data generation uses **sessionStorage-based seeding** for consistency:
+
+```javascript
+// Seed is generated once per browser session
+const seed = getSessionSeed(); // e.g., 1771176130016
+const random = createSeededRandom(seed);
+```
+
+**How It Works:**
+1. First app load → generates unique seed using `Date.now()`
+2. Seed saved to `sessionStorage.getItem("dashboard_seed")`
+3. All subsequent page loads/refreshes use same seed
+4. Same seed = identical dataset throughout session
+
+### When Data Changes
+
+**Data Regenerates (New Seed) When:**
+- New browser tab opened
+- Browser session ends (tab/window closed)
+- Opening in incognito/private mode
+- Different browser used
+- sessionStorage manually cleared
+
+**Data Stays Same When:**
+- Page refresh (F5 / Ctrl+R)
+- Navigating between Dashboard/Transactions/Risk Analysis
+- Applying filters or sorting
+- Hard reload
+
+### Benefits
+
+- **Consistency**: Same user sees identical data throughout their session
+- **Variety**: Different users/sessions see different realistic datasets
+- **Reproducibility**: Can manually set seed for testing specific scenarios
+- **Realistic Demo**: Stable data for presentations and testing
 
 ## State Management Strategy
 
@@ -123,6 +176,14 @@ npm run build
 ```
 
 ## Design Decisions
+
+### Why Seeded Deterministic Data Generation?
+
+- **Session Stability**: Users see consistent data throughout their entire session, enabling reliable testing and demos
+- **Linear Congruential Generator**: Simple, fast pseudo-random algorithm that produces identical sequences from the same seed
+- **sessionStorage Persistence**: Seed survives page refreshes but creates new data per tab/session for variety
+- **No Backend Required**: Generates realistic data client-side without API calls or database
+- **Reproducible Testing**: Can manually set specific seeds to test edge cases or reproduce bugs
 
 ### Why Context API over Redux?
 
