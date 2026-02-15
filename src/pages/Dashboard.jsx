@@ -1,4 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
+import { FilterContext } from '../context/FilterContext';
+import FilterPanel from '../components/filters/FilterPanel';
 import KPICard from '../components/dashboard/KPICard';
 import RevenueChart from '../components/dashboard/RevenueChart';
 import RegionChart from '../components/dashboard/RegionChart';
@@ -16,51 +18,81 @@ import {
 } from '../utils/calculations';
 
 function Dashboard() {
+  const { filters } = useContext(FilterContext);
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(txn => {
+      if (filters.region !== 'All' && txn.region !== filters.region) {
+        return false;
+      }
+
+      if (filters.riskLevel !== 'All' && txn.status !== filters.riskLevel) {
+        return false;
+      }
+
+      if (filters.type !== 'All' && txn.type !== filters.type) {
+        return false;
+      }
+
+      if (filters.startDate && txn.date < filters.startDate) {
+        return false;
+      }
+
+      if (filters.endDate && txn.date > filters.endDate) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [filters]);
+
   const totalRevenue = useMemo(() => 
-    calculateTotalRevenue(transactions), 
-    []
+    calculateTotalRevenue(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const totalLeakage = useMemo(() => 
-    calculateTotalLeakage(transactions), 
-    []
+    calculateTotalLeakage(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const leakagePercentage = useMemo(() => 
-    calculateLeakagePercentage(transactions), 
-    []
+    calculateLeakagePercentage(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const avgTransaction = useMemo(() => 
-    calculateAverageTransaction(transactions), 
-    []
+    calculateAverageTransaction(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const suspiciousCount = useMemo(() => 
-    countSuspiciousTransactions(transactions), 
-    []
+    countSuspiciousTransactions(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const monthlyRevenue = useMemo(() => 
-    groupRevenueByMonth(transactions), 
-    []
+    groupRevenueByMonth(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const regionRevenue = useMemo(() => 
-    groupRevenueByRegion(transactions), 
-    []
+    groupRevenueByRegion(filteredTransactions), 
+    [filteredTransactions]
   );
 
   const riskDistribution = useMemo(() => 
-    groupRiskDistribution(transactions), 
-    []
+    groupRiskDistribution(filteredTransactions), 
+    [filteredTransactions]
   );
 
-  const totalTransactions = transactions.length;
+  const totalTransactions = filteredTransactions.length;
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Dashboard</h1>
+      
+      <FilterPanel />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <KPICard
@@ -84,7 +116,7 @@ function Dashboard() {
         <KPICard
           title="Suspicious Transactions"
           value={suspiciousCount}
-          subtitle={`${((suspiciousCount / totalTransactions) * 100).toFixed(1)}% of total`}
+          subtitle={`${totalTransactions > 0 ? ((suspiciousCount / totalTransactions) * 100).toFixed(1) : 0}% of total`}
         />
         
         <KPICard
