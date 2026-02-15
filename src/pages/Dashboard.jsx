@@ -5,7 +5,6 @@ import KPICard from '../components/dashboard/KPICard';
 import RevenueChart from '../components/dashboard/RevenueChart';
 import RegionChart from '../components/dashboard/RegionChart';
 import RiskChart from '../components/dashboard/RiskChart';
-import transactions from '../data/transactions.json';
 import {
   calculateTotalRevenue,
   calculateTotalLeakage,
@@ -18,7 +17,7 @@ import {
 } from '../utils/calculations';
 
 function Dashboard() {
-  const { filters } = useContext(FilterContext);
+  const { filters, transactions } = useContext(FilterContext);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(txn => {

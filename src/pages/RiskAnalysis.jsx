@@ -1,6 +1,5 @@
 import { useMemo, useContext } from 'react';
 import { FilterContext } from '../context/FilterContext';
-import transactions from '../data/transactions.json';
 import { groupRevenueByMonth } from '../utils/calculations';
 import KPICard from '../components/dashboard/KPICard';
 import {
@@ -14,7 +13,7 @@ import {
 } from 'recharts';
 
 function RiskAnalysis() {
-  const { filters } = useContext(FilterContext);
+  const { filters, transactions } = useContext(FilterContext);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter(txn => {

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function Sidebar() {
   return (
     <aside className="w-64 bg-gray-800 text-white min-h-screen p-6">
@@ -7,19 +9,19 @@ function Sidebar() {
       <nav>
         <ul className="space-y-2">
           <li>
-            <a href="/dashboard" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <Link to="/dashboard" className="block py-2 px-4 hover:bg-gray-700 rounded">
               Dashboard
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/transactions" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <Link to="/transactions" className="block py-2 px-4 hover:bg-gray-700 rounded">
               Transactions
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/risk-analysis" className="block py-2 px-4 hover:bg-gray-700 rounded">
+            <Link to="/risk-analysis" className="block py-2 px-4 hover:bg-gray-700 rounded">
               Risk Analysis
-            </a>
+            </Link>
           </li>
         </ul>
       </nav>

@@ -1,9 +1,8 @@
 import { useMemo, useContext, useState } from 'react';
 import { FilterContext } from '../context/FilterContext';
-import transactions from '../data/transactions.json';
 
 function Transactions() {
-  const { filters } = useContext(FilterContext);
+  const { filters, transactions } = useContext(FilterContext);
   const [sortOrder, setSortOrder] = useState('desc');
 
   const filteredTransactions = useMemo(() => {
